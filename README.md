@@ -22,8 +22,8 @@ skimmer({
 	trigger: function(data) {
 		console.log('skimming detected')
 	},
-	rate: 20,
-	delay: 5,
+	rate: 700,
+	delay: 4,
 	multiple: true,
 	update: function(data) {
 		console.log(data)
@@ -36,10 +36,10 @@ skimmer({
 #### trigger: [function] *required*
 Callback function that fires when skimming is detected
 
-#### rate: [number] *optional* (defaults to 750) 
+#### rate: [number] *optional* (defaults to 500) 
 Minimum rate (pixels / second) needed to trigger
 
-#### delay: [number] *optional* (seconds, defaults to 2.5) 
+#### delay: [number] *optional* (seconds, defaults to 2) 
 How long to wait for consistent downward progress before allowing trigger
 
 #### multiple: [boolean] *optional* (defaults to false)

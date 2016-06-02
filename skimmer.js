@@ -13,8 +13,8 @@
 })(() => {
 
 	const lib = ({
-		rate = 750,
-		delay = 2.5,
+		rate = 500,
+		delay = 2,
 		multiple = false,
 		trigger = () => {},
 		update = () => {},
