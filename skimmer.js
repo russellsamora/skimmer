@@ -12,56 +12,39 @@
     }
 })(() => {
 
-	// https://remysharp.com/2010/07/21/throttling-function-calls
-	function throttle(fn, threshhold, scope) {
-		threshhold || (threshhold = 250);
-		var last
-		var deferTimer
-		return function () {
-			var context = scope || this;
-			var now = +new Date
-			var args = arguments
-			if (last && now < last + threshhold) {
-				// hold on to it
-				clearTimeout(deferTimer)
-				deferTimer = setTimeout(function () {
-					last = now
-					fn.apply(context, args)
-				}, threshhold)
-			} else {
-				last = now
-				fn.apply(context, args)
-			}
-		}
-	}
-
-	const lib = ({ sensitivity = 0.5, delay = 2.5, once = true, trigger = () => {}, update = () => {} }) => {
-		// TODO constrain
-		const opts = { sensitivity, delay, once, trigger, update }
+	const lib = (opts) => {
+		opts.rate = opts.rate || 10
+		opts.delay = opts.delay || 2.5
+		opts.multiple = opts.multiple
+		opts.trigger = opts.trigger || (() => {})
+		opts.update = opts.update || (() => {})
 
 		const SECOND = 1000
-		const SKIM_FACTOR = 10
 
-		let handler = null
 		let triggered = false
 		let ignoredFirst = false
 
 		const data = {
 			scroll: {
 				previous: 0,
-				net: 0
+				net: 0,
 			},
 			time: {
 				previous: 0,
 				net: 0,
-				start: 0
-			}
+				start: 0,
+			},
 		}
+
+		let ticking = false
+
+		const raf = window.requestAnimationFrame
+			|| function(callback) { return setTimeout(callback, 1000 / 60) }
 
 		const fix = (number) => +number.toFixed(2)
 
-		const sendUpdate = (score = 0, elapsed = 0, percent = 0) =>
-			opts.update({ score: fix(score), elapsed: fix(elapsed), percent: fix(percent) })
+		const sendUpdate = (rate = 0, elapsed = 0, percent = 0) =>
+			opts.update({ rate: fix(rate), elapsed: fix(elapsed), percent: fix(percent) })
 
 		const reset = () => {
 			data.scroll.net = 0
@@ -72,7 +55,8 @@
 			sendUpdate()
 		}
 
-		const handleScroll = () => {
+		const updateScroll = () => {
+			ticking = false
 			if (ignoredFirst) {
 				const totalHeight = document.documentElement.scrollHeight - window.innerHeight
 				const currentScrollPos = window.pageYOffset
@@ -83,47 +67,51 @@
 
 				data.scroll.net += (scrollDiff / totalHeight * 100)
 				data.time.net = currentTime - data.time.start
-				
+
 				data.time.previous = currentTime
 				data.scroll.previous = window.pageYOffset
 
 				// reset if they start going up OR the time jumped more than a second (stopped scrolling)
-				if (scrollDiff < 0 || timeDiff > SECOND) {
+				if (scrollDiff < 0 || timeDiff > SECOND / 2) {
 					reset()
 					return false
-				 }
+				}
 
 				// test if we are skimming!
 				const secondsElapsed = (data.time.net / SECOND)
-				const score = data.scroll.net / secondsElapsed
-				
-				if (score > opts.sensitivity * SKIM_FACTOR && secondsElapsed > opts.delay) {
-					if(!triggered) {
-						opts.trigger({ 
-							score: fix(score),
+				const rate = Math.min(100, data.scroll.net / secondsElapsed)
+
+				if (rate > opts.rate && secondsElapsed > opts.delay) {
+					if (!triggered) {
+						opts.trigger({
+							rate: fix(rate),
 							elapsed: fix(secondsElapsed),
 							percent: fix(data.scroll.net),
-							triggered: true
+							triggered: true,
 						})
 					}
-					if (opts.once) {
+					if (!opts.multiple) {
 						triggered = true
-						window.removeEventListener('scroll', handler, false)
+						window.removeEventListener('scroll', onScroll, false)
 					}
 				} else {
-					sendUpdate(score, secondsElapsed, data.scroll.net)
+					sendUpdate(rate, secondsElapsed, data.scroll.net)
 				}
 
 			} else {
 				ignoredFirst = true
 			}
+			return true
+		}
+
+		const onScroll = () => {
+			if (!ticking) raf(updateScroll)
+			ticking = true
 		}
 
 		const init = () => {
 			reset()
-
-			handler = throttle(handleScroll, SECOND / 4)
-			window.addEventListener('scroll', handler, false)
+			window.addEventListener('scroll', onScroll, false)
 		}
 
 		init()

@@ -64,7 +64,7 @@
 		<article>
 			<h1>Skimmer.js Demo</h1>
 			<p class='description'>Dependency-free JavaScript <a href='https://github.com/russellgoldenberg/skimmer'>library</a> to detect when a user is skimming a page</p>
-			<p class='prompt'>Start scrolling to see examples.</p>
+			<p class='prompt'>Start scrolling to see how it works.</p>
 
 			<p>
 				Veggies es bonus vobis, proinde vos postulo essum magis kohlrabi welsh onion daikon amaranth tatsoi tomatillo melon azuki bean garlic.
@@ -220,32 +220,31 @@
 			</p>
 		</article>
 		<div class='skimmer'>
-			<p class='skimmer-score'>Score: <span>0</span></p>
+			<p class='skimmer-rate'>Rate: <span>0</span></p>
 			<p class='skimmer-elapsed'>Elapsed: <span>0</span></p>
 			<p class='skimmer-percent'>Percent: <span>0</span></p>
 			<p class='skimmer-triggered'>Triggered: <span>false</span></p>
 		</div>
-        <script src='skimmer.js'></script>
+        <script src='skimmer.min.js'></script>
         <script>
 			(function() {
 				const el = document.querySelector('.skimmer')
-				const score = document.querySelector('.skimmer-score span')
+				const rate = document.querySelector('.skimmer-rate span')
 				const elapsed = document.querySelector('.skimmer-elapsed span')
 				const percent = document.querySelector('.skimmer-percent span')
 				const triggered = document.querySelector('.skimmer-triggered span')
 				var updateDOM = function(data) {
-					score.textContent = data.score
+					rate.textContent = data.rate
 					elapsed.textContent = data.elapsed
 					percent.textContent = data.percent
 					triggered.textContent = data.triggered ? 'true' : 'false'
 					el.style.backgroundColor = data.triggered ? '#88ffff' : '#ffff88'
 				}
 				skimmer({
-					once: false,
-					update: function(data) {
+					trigger: function(data) {
 						updateDOM(data)
 					},
-					trigger: function(data) {
+					update: function(data) {
 						updateDOM(data)
 					},
 				})
