@@ -12,15 +12,14 @@
     }
 })(() => {
 
-	const lib = (opts) => {
-		opts.rate = opts.rate || 10
-		opts.delay = opts.delay || 2.5
-		opts.multiple = opts.multiple
-		opts.trigger = opts.trigger || (() => {})
-		opts.update = opts.update || (() => {})
-
+	const lib = ({
+		rate = 750,
+		delay = 2.5,
+		multiple = false,
+		trigger = () => {},
+		update = () => {},
+	}) => {
 		const SECOND = 1000
-
 		let triggered = false
 		let ignoredFirst = false
 
@@ -43,29 +42,30 @@
 
 		const fix = (number) => +number.toFixed(2)
 
-		const sendUpdate = (rate = 0, elapsed = 0, percent = 0) =>
-			opts.update({ rate: fix(rate), elapsed: fix(elapsed), percent: fix(percent) })
-
 		const reset = () => {
 			data.scroll.net = 0
 			data.time.net = 0
 			data.time.start = new Date().getTime()
 			data.time.previous = new Date().getTime()
 
-			sendUpdate()
+			update({ rate: 0, distance: 0, elapsed: 0 })
 		}
+
+		// const onResize = () => {
+		// 	viewportHeight = window.innerHeight
+		// 	reset()
+		// }
 
 		const updateScroll = () => {
 			ticking = false
 			if (ignoredFirst) {
-				const totalHeight = document.documentElement.scrollHeight - window.innerHeight
 				const currentScrollPos = window.pageYOffset
 				const currentTime = new Date().getTime()
 
 				const scrollDiff = currentScrollPos - data.scroll.previous
 				const timeDiff = currentTime - data.time.previous
 
-				data.scroll.net += (scrollDiff / totalHeight * 100)
+				data.scroll.net += scrollDiff
 				data.time.net = currentTime - data.time.start
 
 				data.time.previous = currentTime
@@ -79,23 +79,26 @@
 
 				// test if we are skimming!
 				const secondsElapsed = (data.time.net / SECOND)
-				const rate = Math.min(100, data.scroll.net / secondsElapsed)
+				const currentRate = data.scroll.net / secondsElapsed
 
-				if (rate > opts.rate && secondsElapsed > opts.delay) {
+				if (currentRate > rate && secondsElapsed > delay) {
 					if (!triggered) {
-						opts.trigger({
-							rate: fix(rate),
+						trigger({
+							rate: Math.round(currentRate),
+							distance: Math.round(data.scroll.net),
 							elapsed: fix(secondsElapsed),
-							percent: fix(data.scroll.net),
-							triggered: true,
 						})
 					}
-					if (!opts.multiple) {
+					if (!multiple) {
 						triggered = true
 						window.removeEventListener('scroll', onScroll, false)
 					}
 				} else {
-					sendUpdate(rate, secondsElapsed, data.scroll.net)
+					update({ 
+						rate: Math.round(currentRate),
+						distance: Math.round(data.scroll.net),
+						elapsed: fix(secondsElapsed),
+					})
 				}
 
 			} else {
