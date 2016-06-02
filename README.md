@@ -2,6 +2,9 @@
 
 Dependency-free JavaScript library to detect when a user is skimming the a page. [See demo](https://russellgoldenberg.github.io/skimmer/).
 
+## Install 
+`npm i skimmer --save` or grab the js file above.
+
 ## Basic usage 
 
 ```
