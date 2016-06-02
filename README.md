@@ -19,7 +19,7 @@ skimmer({
 	trigger: function(data) {
 		console.log('skimming detected')
 	},
-	sensitivity: 0.3,
+	rate: 20,
 	delay: 5,
 	multiple: true,
 	update: function(data) {
