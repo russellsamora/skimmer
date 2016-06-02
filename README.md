@@ -33,13 +33,13 @@ skimmer({
 #### trigger: [function] *required*
 Callback function that fires when skimming is detected
 
-#### rate: [number] (0 to 100, defaults to 10) *optional*
+#### rate: [number] *optional* (0 to 100, defaults to 10) 
 Minimum rate (percent scrolled per second) needed to trigger
 
-#### delay: [number] (seconds, defaults to 2.5) *optional*
+#### delay: [number] *optional* (seconds, defaults to 2.5) 
 How long to wait for consistent downward progress before allowing trigger
 
-#### multiple: [boolean] (defaults to false) *optional*
+#### multiple: [boolean] *optional* (defaults to false)
 Whether to fire one or infinite skim detection triggers
 
 #### update: [function] *optional*
