@@ -76,6 +76,7 @@
         		background: #fff;
         		height: 100vh;
         		text-align: center;
+        		cursor: pointer;
         	}
         	.reveal img {
         		display: block;
@@ -126,6 +127,9 @@
 					trigger: function(data) {
 						updateDOM(data, true)
 						reveal.classList.remove('hide')
+						reveal.addEventListener('click', function() {
+							this.classList.add('hide')
+						})
 					},
 					update: function(data) {
 						updateDOM(data)
