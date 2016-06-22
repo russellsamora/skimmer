@@ -68,6 +68,21 @@
         	.hide {
         		display: none;
         	}
+        	.reveal {
+        		position: fixed;
+        		width: 100%;
+        		top: 0;
+        		left: 0;
+        		background: #fff;
+        		height: 100vh;
+        		text-align: center;
+        	}
+        	.reveal img {
+        		display: block;
+        		max-width: 720px;
+        		width: 90%;
+        		margin: 0 auto;
+        	}
         </style>
 	</head>
 	<body>
@@ -88,10 +103,16 @@
 			<p class='skimmer-distance'>Distance: <span>0</span></p>
 			<p class='skimmer-elapsed'>Elapsed: <span>0</span></p>
 		</div>
+		<div class='reveal hide'>
+			<p>Skimming detected.</p>
+			<img src='img/67.jpg'>
+			<p><a href='https://github.com/russellgoldenberg/skimmer'>Get the code and read the docs</a></p>
+		</div>
         <script src='skimmer.min.js'></script>
         <script>
 			(function() {
 				const el = document.querySelector('.skimmer')
+				const reveal = document.querySelector('.reveal')
 				const rate = document.querySelector('.skimmer-rate span')
 				const distance = document.querySelector('.skimmer-distance span')
 				const elapsed = document.querySelector('.skimmer-elapsed span')
@@ -104,6 +125,7 @@
 				skimmer({
 					trigger: function(data) {
 						updateDOM(data, true)
+						reveal.classList.remove('hide')
 					},
 					update: function(data) {
 						updateDOM(data)
